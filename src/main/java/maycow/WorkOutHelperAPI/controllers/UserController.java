@@ -28,6 +28,13 @@ public class UserController {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+        // localhost:8080/user/1
+    @GetMapping("/{id}")
+    public ResponseEntity<User> findById (@PathVariable Long id) {
+        User obj = this.userService.findById(id);
+        return ResponseEntity.ok().body(obj);
+    }
+
     @PostMapping("/register")
     @Validated(CreateUser.class)
     public ResponseEntity<String> register(@Valid @RequestBody User user) {
@@ -62,12 +69,6 @@ public class UserController {
 //        return ResponseEntity.ok().body(listUser);
 //    }
 //
-//    // localhost:8080/user/1
-//    @GetMapping("/{id}")
-//    public ResponseEntity<User> findById (@PathVariable Long id) {
-//        User obj = this.userService.findById(id);
-//        return ResponseEntity.ok().body(obj);
-//    }
 
 
 //    @PutMapping("/{id}")

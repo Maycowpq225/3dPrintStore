@@ -3,11 +3,16 @@ package maycow.WorkOutHelperAPI.services;
 import maycow.WorkOutHelperAPI.models.User;
 import maycow.WorkOutHelperAPI.models.enums.ProfileEnum;
 import maycow.WorkOutHelperAPI.repositories.UserRepository;
+import maycow.WorkOutHelperAPI.security.UserSpringSecurity;
+import maycow.WorkOutHelperAPI.services.exceptions.AuthorizationException;
+import maycow.WorkOutHelperAPI.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,6 +26,16 @@ public class UserService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    public User findById(Long id) {
+        UserSpringSecurity userSpringSecurity = authenticated();
+        if (!Objects.nonNull(userSpringSecurity)
+                || !userSpringSecurity.hasRole(ProfileEnum.ADMIN) && !id.equals(userSpringSecurity.getId()))
+            throw new AuthorizationException("Acesso negado!");
+
+        Optional<User> user = this.userRepository.findById(id);
+        return user.orElseThrow(() -> new ObjectNotFoundException(
+                "Usuário não encontrado! Id: " + id + ", Tipo: " + User.class.getName()));
+    }
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
@@ -31,6 +46,14 @@ public class UserService {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setProfiles(Stream.of(ProfileEnum.USER.getCode()).collect(Collectors.toSet()));
         return this.userRepository.save(user);
+    }
+
+    public static UserSpringSecurity authenticated() {
+        try {
+            return (UserSpringSecurity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 
@@ -59,12 +82,6 @@ public class UserService {
 //        return userList;
 //    }
 //
-//    public User findById(Long id) {
-//        Optional<User> user = this.userRepository.findById(id);
-//        return user.orElseThrow(() -> new RuntimeException(
-//            "Usuario não encontrado! " + id + ", Tipo: " + User.class.getName()
-//        ));
-//    }
 
 //    @Transactional // Always use in data base insertions
 //    public User Update(User user) {
