@@ -12,7 +12,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity // It means that the class is a table in the database
@@ -24,19 +23,10 @@ public class User {
 
     public static final String TABLE_NAME = "user";
 
-    @Id  // Define as ID
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Generating sequence ids
-    @Column(name = "id", unique = true) // Criando coluna
-    private Long id;
-
-//    @Id
-//    @GeneratedValue(generator = "UUID")
-//    @GenericGenerator(
-//            name = "UUID",
-//            strategy = "org.hibernate.id.UUIDGenerator"
-//    )
-//    @Column(updatable = false, nullable = false)
-//    private UUID id;
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String id;
 
     @Column(name = "username", length = 256, nullable = false, unique = true)
     @NotBlank(message = "Email não pode ser vazio")

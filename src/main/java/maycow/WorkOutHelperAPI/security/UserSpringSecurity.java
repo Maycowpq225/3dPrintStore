@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 @Getter
 public class UserSpringSecurity implements UserDetails {
 
-    private Long id;
+    private String id;
     private String username;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserSpringSecurity(Long id, String username, String password, Set<ProfileEnum> profileEnum) {
+    public UserSpringSecurity(String id, String username, String password, Set<ProfileEnum> profileEnum) {
         this.id = id;
         this.username = username;
         this.password = password;

@@ -31,7 +31,7 @@ public class UserService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public User findById(Long id) {
+    public User findById(String id) {
         UserSpringSecurity userSpringSecurity = authenticated();
         if (!Objects.nonNull(userSpringSecurity)
                 || !userSpringSecurity.hasRole(ProfileEnum.ADMIN) && !id.equals(userSpringSecurity.getId()))
