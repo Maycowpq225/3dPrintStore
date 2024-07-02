@@ -1,17 +1,22 @@
 package maycow.WorkOutHelperAPI.services;
 
 import maycow.WorkOutHelperAPI.models.User;
+import maycow.WorkOutHelperAPI.models.dto.UserCreateDTO;
+import maycow.WorkOutHelperAPI.models.dto.UserUpdateDTO;
 import maycow.WorkOutHelperAPI.models.enums.ProfileEnum;
 import maycow.WorkOutHelperAPI.repositories.UserRepository;
 import maycow.WorkOutHelperAPI.security.UserSpringSecurity;
 import maycow.WorkOutHelperAPI.services.exceptions.AuthorizationException;
+import maycow.WorkOutHelperAPI.services.exceptions.DuplicateRecordException;
 import maycow.WorkOutHelperAPI.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,6 +59,20 @@ public class UserService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public User fromDTO(@Valid UserCreateDTO obj) {
+        User user = new User();
+        user.setEmail(obj.getEmail());
+        user.setPassword(obj.getPassword());
+        return user;
+    }
+
+    public User fromDTO(@Valid UserUpdateDTO obj) {
+        User user = new User();
+        user.setId(obj.getId());
+        user.setPassword(obj.getPassword());
+        return user;
     }
 
 

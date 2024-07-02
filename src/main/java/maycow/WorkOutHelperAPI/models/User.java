@@ -1,31 +1,26 @@
 package maycow.WorkOutHelperAPI.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import maycow.WorkOutHelperAPI.models.enums.ProfileEnum;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity // It means that the class is a table in the database
-@Table(name = User.TABLE_NAME) // This all create the table and define it as a Entity
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
+@Table(name = User.TABLE_NAME)  // This all create the table and define it as a Entity
+@AllArgsConstructor             // Construct with all arguments
+@NoArgsConstructor              // Construct with no arguments
+@Data                           // Creates Getters and Setters
 public class User {
-
-    public interface CreateUser {};
-    public interface UpdateUser {};
 
     public static final String TABLE_NAME = "user";
 
@@ -34,17 +29,24 @@ public class User {
     @Column(name = "id", unique = true) // Criando coluna
     private Long id;
 
+//    @Id
+//    @GeneratedValue(generator = "UUID")
+//    @GenericGenerator(
+//            name = "UUID",
+//            strategy = "org.hibernate.id.UUIDGenerator"
+//    )
+//    @Column(updatable = false, nullable = false)
+//    private UUID id;
+
     @Column(name = "username", length = 256, nullable = false, unique = true)
-    @NotNull(groups = CreateUser.class)
-    @NotEmpty(groups = CreateUser.class)
+    @NotBlank(message = "Email não pode ser vazio")
     @Size(min = 10, max = 256)
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password", length = 100, nullable = false)
-    @NotNull(groups = {CreateUser.class, UpdateUser.class})
-    @NotEmpty(groups = {CreateUser.class, UpdateUser.class})
-    @Size(groups = {CreateUser.class, UpdateUser.class}, min = 2, max = 100)
+    @NotBlank(message = "Senha não pode ser vazia")
+    @Size(min = 8, max = 60)
     private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)

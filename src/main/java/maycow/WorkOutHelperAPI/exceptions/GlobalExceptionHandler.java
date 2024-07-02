@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 
 import maycow.WorkOutHelperAPI.services.exceptions.AuthorizationException;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -54,30 +53,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<Object> handleAllUncaughtException(
-            Exception exception,
-            WebRequest request) {
+    public ResponseEntity<Object> handleAllUncaughtException(Exception exception, WebRequest request) {
         final String errorMessage = "Unknown error occurred";
         log.error(errorMessage, exception);
-        return buildErrorResponse(
-                exception,
-                errorMessage,
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                request);
+        return buildErrorResponse(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<Object> handleDataIntegrityViolationException(
-            DataIntegrityViolationException dataIntegrityViolationException,
-            WebRequest request) {
-        String errorMessage = dataIntegrityViolationException.getMostSpecificCause().getMessage();
-        log.error("Failed to save entity with integrity problems: " + errorMessage, dataIntegrityViolationException);
-        return buildErrorResponse(
-                dataIntegrityViolationException,
-                errorMessage,
-                HttpStatus.CONFLICT,
-                request);
+    public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        String errorMessage = e.getMostSpecificCause().getMessage();
+        log.error("Failed to save entity with integrity problems: " + errorMessage, e);
+        return buildErrorResponse(errorMessage, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -87,9 +74,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
             WebRequest request) {
         log.error("Failed to validate element", constraintViolationException);
         return buildErrorResponse(
-                constraintViolationException,
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                request);
+                "Failed to validate element",
+                HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(ObjectNotFoundException.class)
@@ -99,9 +85,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
             WebRequest request) {
         log.error("Failed to find the requested element", objectNotFoundException);
         return buildErrorResponse(
-                objectNotFoundException,
-                HttpStatus.NOT_FOUND,
-                request);
+                "Authorization error",
+                HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(DataBindingViolationException.class)
@@ -111,9 +96,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
             WebRequest request) {
         log.error("Failed to save entity with associated data", dataBindingViolationException);
         return buildErrorResponse(
-                dataBindingViolationException,
-                HttpStatus.CONFLICT,
-                request);
+                "Authorization error",
+                HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(AuthenticationException.class)
@@ -123,9 +107,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
             WebRequest request) {
         log.error("Authentication error ", authenticationException);
         return buildErrorResponse(
-                authenticationException,
-                HttpStatus.UNAUTHORIZED,
-                request);
+                "Authorization error",
+                HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -135,9 +118,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
             WebRequest request) {
         log.error("Authorization error ", accessDeniedException);
         return buildErrorResponse(
-                accessDeniedException,
-                HttpStatus.FORBIDDEN,
-                request);
+                "Authorization error",
+                HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(AuthorizationException.class)
@@ -147,27 +129,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
             WebRequest request) {
         log.error("Authorization error ", authorizationException);
         return buildErrorResponse(
-                authorizationException,
-                HttpStatus.FORBIDDEN,
-                request);
+                "Authorization error",
+                HttpStatus.FORBIDDEN);
     }
 
-    private ResponseEntity<Object> buildErrorResponse(
-            Exception exception,
-            HttpStatus httpStatus,
-            WebRequest request) {
-        return buildErrorResponse(exception, exception.getMessage(), httpStatus, request);
-    }
-
-    private ResponseEntity<Object> buildErrorResponse(
-            Exception exception,
-            String message,
-            HttpStatus httpStatus,
-            WebRequest request) {
+    private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus httpStatus) {
         ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message);
-        if (this.printStackTrace) {
-            errorResponse.setStackTrace(ExceptionUtils.getStackTrace(exception));
-        }
         return ResponseEntity.status(httpStatus).body(errorResponse);
     }
 
@@ -180,5 +147,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
         ErrorResponse errorResponse = new ErrorResponse(status, "Email ou senha inválidos.");
         response.getWriter().append(errorResponse.toJson());
     }
-
 }

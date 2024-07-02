@@ -1,19 +1,17 @@
 package maycow.WorkOutHelperAPI.controllers;
 
 import maycow.WorkOutHelperAPI.models.User;
-import maycow.WorkOutHelperAPI.models.User.CreateUser;
-import maycow.WorkOutHelperAPI.models.User.UpdateUser;
+import maycow.WorkOutHelperAPI.models.dto.UserCreateDTO;
 import maycow.WorkOutHelperAPI.services.UserService;
+import maycow.WorkOutHelperAPI.services.exceptions.DuplicateRecordException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 
 
@@ -36,9 +34,9 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    @Validated(CreateUser.class)
-    public ResponseEntity<String> register(@Valid @RequestBody User user) {
-        this.userService.create(user);
+    public ResponseEntity<String> register(@Valid @RequestBody UserCreateDTO userDTO) {
+        User user = this.userService.fromDTO(userDTO);
+        user = this.userService.create(user);
         return ResponseEntity.ok("Usuário Registrado com sucesso!");
     }
 
