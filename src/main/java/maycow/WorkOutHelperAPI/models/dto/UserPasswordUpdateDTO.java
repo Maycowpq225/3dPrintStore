@@ -10,12 +10,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UserUpdateDTO {
-
-    private String id;
+public class UserPasswordUpdateDTO {
 
     @NotBlank
     @Size(min = 8, max = 60)
-    private String password;
+    private String old_password;
+
+    @NotBlank
+    @Size(min = 8, max = 60)
+    private String new_password;
 
 }

@@ -1,8 +1,11 @@
 package maycow.WorkOutHelperAPI.controllers;
 
-import maycow.WorkOutHelperAPI.models.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import maycow.WorkOutHelperAPI.models.*;
+import maycow.WorkOutHelperAPI.models.dto.MessageResponseDTO;
 import maycow.WorkOutHelperAPI.models.dto.UserCreateDTO;
 import maycow.WorkOutHelperAPI.models.dto.UserIdDTO;
+import maycow.WorkOutHelperAPI.models.dto.UserPasswordUpdateDTO;
 import maycow.WorkOutHelperAPI.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@RestController
+@RestController // lidar com aspectos relacionados à entrada e saída HTTP
 @RequestMapping("/user")
 @Validated
 public class UserController {
@@ -33,9 +36,20 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<UserIdDTO> register(@Valid @RequestBody UserCreateDTO userDTO) {
-        User user = this.userService.fromDTO(userDTO);
-        user = this.userService.create(user);
+        User user = this.userService.create(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(new UserIdDTO(user.getId()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MessageResponseDTO> delete(@PathVariable String id) {
+        this.userService.deleteById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDTO("Conta excluida com sucesso"));
+    }
+
+    @PutMapping("/{id}")
+        public ResponseEntity<MessageResponseDTO> changePassword(@Valid @RequestBody UserPasswordUpdateDTO userPasswordUpdateDTO, @PathVariable String id) {
+        this.userService.updatePassword(userPasswordUpdateDTO, id);
+        return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDTO("Senha alterada com sucesso"));
     }
 
 
@@ -44,20 +58,6 @@ public class UserController {
 //    public ResponseEntity<List<User>> findAll () {
 //        List<User> listUser = this.userService.findAll();
 //        return ResponseEntity.ok().body(listUser);
-//    }
-//
-//    @PutMapping("/{id}")
-//    @Validated(UpdateUser.class)
-//    public ResponseEntity<Void> update(@Valid @RequestBody User obj, @PathVariable Long id) {
-//        obj.setId(id);
-//        this.userService.Update(obj);
-//        return ResponseEntity.noContent().build();
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> delete(@PathVariable Long id) {
-//        this.userService.Delete(id);
-//        return ResponseEntity.noContent().build();
 //    }
     
 }

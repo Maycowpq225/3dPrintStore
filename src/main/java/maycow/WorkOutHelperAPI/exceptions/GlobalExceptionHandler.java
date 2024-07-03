@@ -124,12 +124,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
 
     @ExceptionHandler(AuthorizationException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ResponseEntity<Object> handleAuthorizationException(
-            AuthorizationException authorizationException,
-            WebRequest request) {
+    public ResponseEntity<Object> handleAuthorizationException(AuthorizationException authorizationException) {
         log.error("Authorization error ", authorizationException);
         return buildErrorResponse(
-                "Authorization error",
+                authorizationException.getMessage(),
                 HttpStatus.FORBIDDEN);
     }
 
