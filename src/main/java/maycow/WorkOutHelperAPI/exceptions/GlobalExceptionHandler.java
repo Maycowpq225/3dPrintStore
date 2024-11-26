@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -130,6 +131,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
                 authorizationException.getMessage(),
                 HttpStatus.FORBIDDEN);
     }
+
+//    @ExceptionHandler(ConstraintViolationException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException constraintViolationException) {
+//        log.error("Authorization error ", constraintViolationException);
+//        return buildErrorResponse(
+//                constraintViolationException.getMessage(),
+//                HttpStatus.BAD_REQUEST);
+//    }
 
     private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus httpStatus) {
         ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message);

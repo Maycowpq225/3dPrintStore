@@ -10,7 +10,9 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,21 +33,32 @@ public class User {
     private String id;
 
     @Column(name = "username", length = 256, nullable = false, unique = true)
-    @NotBlank(message = "Email não pode ser vazio")
+    @NotBlank(message = "Email não pode ser vazio.")
     @Size(min = 10, max = 256)
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password", length = 100, nullable = false)
-    @NotBlank(message = "Senha não pode ser vazia")
+    @NotBlank(message = "Senha não pode ser vazia.")
     @Size(min = 8, max = 60)
     private String password;
 
     @JsonFormat(pattern="yyyy-MM-dd")
     @Temporal(TemporalType.DATE)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "birthday", nullable = false)
     private Date birthday;
+
+    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ]+( [A-Za-zÀ-ÖØ-öø-ÿ]+)*$", message = "O nome deve conter apenas letras, com um espaço entre os nomes.")
+    @Column(name = "name", length = 256, nullable = false)
+    @NotBlank(message = "Nome não pode ser vazio.")
+    @Size(min = 2, max = 256)
+    private String name;
+
+    @Column(name = "email_status_account", nullable = false)
+    private Boolean email_status_account;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime created_at;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -60,4 +73,11 @@ public class User {
     public void addProfile(ProfileEnum profileEnum) {
         this.profiles.add(profileEnum.getCode());
     }
+
+    @PrePersist
+    protected void onCreate() {
+        created_at = LocalDateTime.now();
+        email_status_account = false;
+    }
+
 }
