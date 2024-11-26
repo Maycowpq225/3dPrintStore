@@ -1,5 +1,6 @@
 package maycow.WorkOutHelperAPI.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,6 +40,12 @@ public class User {
     @NotBlank(message = "Senha não pode ser vazia")
     @Size(min = 8, max = 60)
     private String password;
+
+    @JsonFormat(pattern="yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(name = "birthday", nullable = false)
+    private Date birthday;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
