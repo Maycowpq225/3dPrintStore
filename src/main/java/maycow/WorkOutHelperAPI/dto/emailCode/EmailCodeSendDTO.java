@@ -1,4 +1,4 @@
-package maycow.WorkOutHelperAPI.models.dto;
+package maycow.WorkOutHelperAPI.dto.emailCode;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,11 +11,11 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class MessageResponseDTO {
+public class EmailCodeSendDTO {
 
     @NotBlank
     @Size(min = 10, max = 256)
     @Email
-    private String message;
+    private String email;
 
 }

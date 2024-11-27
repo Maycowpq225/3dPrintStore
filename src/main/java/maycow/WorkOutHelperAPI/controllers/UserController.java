@@ -1,11 +1,10 @@
 package maycow.WorkOutHelperAPI.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import maycow.WorkOutHelperAPI.dto.MessageResponseDTO;
+import maycow.WorkOutHelperAPI.dto.user.UserCreateDTO;
+import maycow.WorkOutHelperAPI.dto.user.UserIdDTO;
+import maycow.WorkOutHelperAPI.dto.user.UserPasswordUpdateDTO;
 import maycow.WorkOutHelperAPI.models.*;
-import maycow.WorkOutHelperAPI.models.dto.MessageResponseDTO;
-import maycow.WorkOutHelperAPI.models.dto.UserCreateDTO;
-import maycow.WorkOutHelperAPI.models.dto.UserIdDTO;
-import maycow.WorkOutHelperAPI.models.dto.UserPasswordUpdateDTO;
 import maycow.WorkOutHelperAPI.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,13 +50,4 @@ public class UserController {
         this.userService.updatePassword(userPasswordUpdateDTO, id);
         return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDTO("Senha alterada com sucesso"));
     }
-
-
-    // localhost:8080/user/1
-//    @GetMapping("/all")
-//    public ResponseEntity<List<User>> findAll () {
-//        List<User> listUser = this.userService.findAll();
-//        return ResponseEntity.ok().body(listUser);
-//    }
-    
 }

@@ -1,4 +1,5 @@
 package maycow.WorkOutHelperAPI.exceptions;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -14,8 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -58,6 +59,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
         final String errorMessage = "Unknown error occurred";
         log.error(errorMessage, exception);
         return buildErrorResponse(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException usernameNotFoundException) {
+        log.error("Failed to find the user", usernameNotFoundException);
+        return buildErrorResponse(
+                "User not found!",
+                HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -132,15 +142,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
                 HttpStatus.FORBIDDEN);
     }
 
-//    @ExceptionHandler(ConstraintViolationException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException constraintViolationException) {
-//        log.error("Authorization error ", constraintViolationException);
-//        return buildErrorResponse(
-//                constraintViolationException.getMessage(),
-//                HttpStatus.BAD_REQUEST);
-//    }
-
     private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus httpStatus) {
         ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message);
         return ResponseEntity.status(httpStatus).body(errorResponse);
@@ -148,7 +149,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-                                        AuthenticationException exception) throws IOException, ServletException {
+            AuthenticationException exception) throws IOException, ServletException {
         Integer status = HttpStatus.UNAUTHORIZED.value();
         response.setStatus(status);
         response.setContentType("application/json");

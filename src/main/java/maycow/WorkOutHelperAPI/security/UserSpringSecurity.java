@@ -18,12 +18,14 @@ public class UserSpringSecurity implements UserDetails {
     private String id;
     private String username;
     private String password;
+    private String email;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserSpringSecurity(String id, String username, String password, Set<ProfileEnum> profileEnum) {
+    public UserSpringSecurity(String id, String username, String password, String email, Set<ProfileEnum> profileEnum) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.email = email;
         this.authorities = profileEnum.stream().map(x -> new SimpleGrantedAuthority(x.getDescription())).collect(Collectors.toList());
     }
 

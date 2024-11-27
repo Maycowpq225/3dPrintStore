@@ -1,4 +1,4 @@
-package maycow.WorkOutHelperAPI.models.dto;
+package maycow.WorkOutHelperAPI.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

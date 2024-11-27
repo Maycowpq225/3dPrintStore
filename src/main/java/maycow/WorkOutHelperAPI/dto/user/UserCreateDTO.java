@@ -1,10 +1,9 @@
-package maycow.WorkOutHelperAPI.models.dto;
+package maycow.WorkOutHelperAPI.dto.user;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import javax.websocket.OnMessage;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

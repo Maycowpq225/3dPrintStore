@@ -12,7 +12,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -58,7 +57,7 @@ public class User {
     private Boolean email_status_account;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime created_at;
+    private Date created_at;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -74,9 +73,12 @@ public class User {
         this.profiles.add(profileEnum.getCode());
     }
 
+    /**
+     * Ensure values created by the system
+     */
     @PrePersist
     protected void onCreate() {
-        created_at = LocalDateTime.now();
+        created_at = new Date();
         email_status_account = false;
     }
 
