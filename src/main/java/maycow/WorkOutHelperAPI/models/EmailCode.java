@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 
 @Entity                         // It means that the class is a table in the database
 @Table(name = EmailCode.TABLE_NAME)  // This all create the table and define it as a Entity
@@ -29,6 +30,9 @@ public class EmailCode {
     @Column(name = "code", nullable = false, updatable = false)
     private String code;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
     /**
      * Responsible for creating 5 random numbers
      * @return a string of 5 random numbers
@@ -44,6 +48,7 @@ public class EmailCode {
      */
     @PrePersist
     protected void onCreate() {
+        createdAt = LocalDateTime.now();
         code = generateSecureNumericCode();
     }
 }

@@ -81,5 +81,4 @@ public class User {
         created_at = new Date();
         email_status_account = false;
     }
-
 }
