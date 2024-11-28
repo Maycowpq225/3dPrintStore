@@ -8,5 +8,9 @@ import java.util.Optional;
 
 
 public interface EmailCodeRepository extends JpaRepository<EmailCode, String> {
-    Optional<EmailCode> deleteAllBycreatedAtBefore(LocalDateTime creatAt);
+    void  deleteAllBycreatedAtBefore(LocalDateTime creatAt);
+
+    void  deleteByUser_Id(String userId);
+
+    Optional<EmailCode> findByUser_Id(String userId);
 }

@@ -25,6 +25,7 @@ public class EmailCodeController {
 
     @PostMapping("/send")
     public ResponseEntity<MessageResponseDTO> sendCode(@Valid @RequestBody EmailCodeSendDTO emailCodeSendDTO) {
+        this.emailCodeService.deleteByEmail(emailCodeSendDTO.getEmail());
         this.emailCodeService.sendCode(emailCodeSendDTO.getEmail(), emailCodeSendDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDTO("Código enviado com sucesso!"));
     }
