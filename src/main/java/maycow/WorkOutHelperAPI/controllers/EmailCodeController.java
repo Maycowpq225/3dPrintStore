@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 
 @RestController // lidar com aspectos relacionados à entrada e saída HTTP
@@ -24,7 +25,7 @@ public class EmailCodeController {
     private EmailCodeService emailCodeService;
 
     @PostMapping("/send")
-    public ResponseEntity<MessageResponseDTO> sendCode(@Valid @RequestBody EmailCodeSendDTO emailCodeSendDTO) {
+    public ResponseEntity<MessageResponseDTO> sendCode(@Valid @RequestBody EmailCodeSendDTO emailCodeSendDTO) throws MessagingException {
         this.emailCodeService.deleteByEmail(emailCodeSendDTO.getEmail());
         this.emailCodeService.sendCode(emailCodeSendDTO.getEmail(), emailCodeSendDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDTO("Código enviado com sucesso!"));
