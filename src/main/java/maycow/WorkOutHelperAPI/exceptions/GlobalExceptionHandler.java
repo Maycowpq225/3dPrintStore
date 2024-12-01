@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 
 import maycow.WorkOutHelperAPI.services.exceptions.AuthorizationException;
+import maycow.WorkOutHelperAPI.services.exceptions.InvalidEmailCodeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -51,6 +52,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
             errorResponse.addValidationError(fieldError.getField(), fieldError.getDefaultMessage());
         }
         return ResponseEntity.unprocessableEntity().body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidEmailCodeException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<Object> handleInvalidEmailCodeException(InvalidEmailCodeException invalidEmailCodeException) {
+        final String errorMessage = "Código de ativação do email invalido.";
+        log.error(errorMessage, invalidEmailCodeException);
+        return buildErrorResponse(errorMessage, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(Exception.class)

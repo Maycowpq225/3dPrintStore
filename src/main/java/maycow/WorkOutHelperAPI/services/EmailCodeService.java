@@ -31,20 +31,28 @@ public class EmailCodeService {
     private JavaMailSender mailSender;
 
     @RequiresAuthorization()
-    @Transactional
-    public void sendCode(String email, EmailCodeSendDTO emailCodeSendDTO) throws MessagingException {
-        EmailCode emailCode = new EmailCode();
-        emailCode.setUser(userService.findByEmail(emailCodeSendDTO.getEmail()));
-        this.emailCodeRepository.save(emailCode);
-        this.enviarEmail(email, "Código de confimação GymbroMatch", "Seu código de confirmação é: " + emailCode.getCode());
-    }
-
-    @RequiresAuthorization()
     public EmailCode findByEmail(String email) {
         String id_User = userService.findByEmail(email).getId();
         Optional<EmailCode> emailCode = emailCodeRepository.findByUser_Id(id_User);
         return emailCode.orElseThrow(() -> new ObjectNotFoundException(
                 "Code de email para usuário passado não encontrado! "));
+    }
+
+    @RequiresAuthorization()
+    public EmailCode findByUser_Id(String id_User) {
+        Optional<EmailCode> emailCode = emailCodeRepository.findByUser_Id(id_User);
+        return emailCode.orElseThrow(() -> new ObjectNotFoundException(
+                "Code de email para usuário passado não encontrado! "));
+    }
+
+
+    @RequiresAuthorization()
+    @Transactional
+    public void sendCode(String email, EmailCodeSendDTO emailCodeSendDTO) throws MessagingException {
+        EmailCode emailCode = new EmailCode();
+        emailCode.setUser(userService.findByEmail(emailCodeSendDTO.getEmail()));
+        this.emailCodeRepository.save(emailCode);
+        this.sendEmail(email, "Código de confimação GymbroMatch", "Seu código de confirmação é: " + emailCode.getCode());
     }
 
     @RequiresAuthorization()
@@ -62,7 +70,7 @@ public class EmailCodeService {
     }
 
     @RequiresAuthorization()
-    private void enviarEmail(String para, String assunto, String corpo) throws MailException, MessagingException {
+    private void sendEmail(String para, String assunto, String corpo) throws MailException, MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
 

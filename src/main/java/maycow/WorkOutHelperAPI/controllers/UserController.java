@@ -2,6 +2,7 @@ package maycow.WorkOutHelperAPI.controllers;
 
 import maycow.WorkOutHelperAPI.dto.MessageResponseDTO;
 import maycow.WorkOutHelperAPI.dto.user.UserCreateDTO;
+import maycow.WorkOutHelperAPI.dto.user.UserEmailCodeActivationDTO;
 import maycow.WorkOutHelperAPI.dto.user.UserIdDTO;
 import maycow.WorkOutHelperAPI.dto.user.UserPasswordUpdateDTO;
 import maycow.WorkOutHelperAPI.models.*;
@@ -37,6 +38,12 @@ public class UserController {
     public ResponseEntity<UserIdDTO> register(@Valid @RequestBody UserCreateDTO userDTO) {
         User user = this.userService.create(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(new UserIdDTO(user.getId()));
+    }
+
+    @PostMapping("/email_activation")
+    public ResponseEntity<MessageResponseDTO> emailActivation(@Valid @RequestBody UserEmailCodeActivationDTO userEmailCodeActivationDTO) {
+        this.userService.activateAccountEmail(userEmailCodeActivationDTO);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new MessageResponseDTO("Email da conta ativado com sucesso"));
     }
 
     @DeleteMapping("/{id}")

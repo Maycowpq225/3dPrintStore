@@ -1,20 +1,22 @@
 package maycow.WorkOutHelperAPI.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import maycow.WorkOutHelperAPI.dto.user.UserEmailCodeActivationDTO;
 import maycow.WorkOutHelperAPI.models.User;
 import maycow.WorkOutHelperAPI.annotations.RequiresAuthorization;
 import maycow.WorkOutHelperAPI.dto.user.UserCreateDTO;
 import maycow.WorkOutHelperAPI.dto.user.UserPasswordUpdateDTO;
 import maycow.WorkOutHelperAPI.models.enums.ProfileEnum;
+import maycow.WorkOutHelperAPI.providers.EmailCodeProvider;
 import maycow.WorkOutHelperAPI.repositories.UserRepository;
 import maycow.WorkOutHelperAPI.services.exceptions.AuthorizationException;
+import maycow.WorkOutHelperAPI.services.exceptions.InvalidEmailCodeException;
 import maycow.WorkOutHelperAPI.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,7 +28,21 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private EmailCodeProvider emailCodeProvider;
+
+    @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Transactional
+    public void activateAccountEmail(UserEmailCodeActivationDTO userEmailCodeActivationDTO) {
+        User user = this.findByEmail(userEmailCodeActivationDTO.getEmail());
+        if (emailCodeProvider.isValidEmailCode(user.getId(), userEmailCodeActivationDTO)) {
+            user.setEmail_status_account(true);
+            this.userRepository.save(user);
+        } else {
+            throw new InvalidEmailCodeException("Código invalido!");
+        }
+    }
 
     @Transactional
     public void updatePassword(UserPasswordUpdateDTO userPasswordUpdateDTO, String id) {

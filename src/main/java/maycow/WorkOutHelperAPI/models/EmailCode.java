@@ -23,7 +23,7 @@ public class EmailCode {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "id_user", nullable = false, unique = true)
     private User user; // Referência à entidade User
 
