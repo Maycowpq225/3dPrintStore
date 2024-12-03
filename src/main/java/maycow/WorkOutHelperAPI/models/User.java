@@ -31,7 +31,7 @@ public class User {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
 
-    @Column(name = "username", length = 256, nullable = false, unique = true)
+    @Column(name = "email", length = 256, nullable = false, unique = true)
     @NotBlank(message = "Email não pode ser vazio.")
     @Size(min = 10, max = 256)
     private String email;

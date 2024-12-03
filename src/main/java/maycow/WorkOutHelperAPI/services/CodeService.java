@@ -1,10 +1,10 @@
 package maycow.WorkOutHelperAPI.services;
 
-import maycow.WorkOutHelperAPI.annotations.RequiresAuthorization;
-import maycow.WorkOutHelperAPI.models.EmailCode;
+import maycow.WorkOutHelperAPI.models.Code;
 import maycow.WorkOutHelperAPI.dto.emailCode.EmailCodeSendDTO;
+import maycow.WorkOutHelperAPI.models.User;
+import maycow.WorkOutHelperAPI.providers.UserProvider;
 import maycow.WorkOutHelperAPI.repositories.EmailCodeRepository;
-import maycow.WorkOutHelperAPI.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,51 +16,38 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service // Responsible for cotaining the business logic
-public class EmailCodeService {
+public class CodeService {
 
     @Autowired
     private EmailCodeRepository emailCodeRepository;
 
     @Autowired
-    private UserService userService;
+    private UserProvider userProvider;
 
     @Autowired
     private JavaMailSender mailSender;
 
-    @RequiresAuthorization()
-    public EmailCode findByEmail(String email) {
-        String id_User = userService.findByEmail(email).getId();
-        Optional<EmailCode> emailCode = emailCodeRepository.findByUser_Id(id_User);
-        return emailCode.orElseThrow(() -> new ObjectNotFoundException(
-                "Code de email para usuário passado não encontrado! "));
-    }
+    /** DO NOT REQUIRE AUTHENTICATION **/
 
-    @RequiresAuthorization()
-    public EmailCode findByUser_Id(String id_User) {
-        Optional<EmailCode> emailCode = emailCodeRepository.findByUser_Id(id_User);
-        return emailCode.orElseThrow(() -> new ObjectNotFoundException(
-                "Code de email para usuário passado não encontrado! "));
-    }
-
-
-    @RequiresAuthorization()
     @Transactional
-    public void sendCode(String email, EmailCodeSendDTO emailCodeSendDTO) throws MessagingException {
-        EmailCode emailCode = new EmailCode();
-        emailCode.setUser(userService.findByEmail(emailCodeSendDTO.getEmail()));
-        this.emailCodeRepository.save(emailCode);
-        this.sendEmail(email, "Código de confimação GymbroMatch", "Seu código de confirmação é: " + emailCode.getCode());
-    }
-
-    @RequiresAuthorization()
-    @Transactional
-    public void deleteByEmail(String email) {
-        String id_User = userService.findByEmail(email).getId();
+    public void deleteCodeByEmail(String email) {
+        String id_User = userProvider.findIdbyEmail(email);
         emailCodeRepository.deleteByUser_Id(id_User);
     }
+
+    @Transactional
+    public void sendCode(EmailCodeSendDTO emailCodeSendDTO) throws MessagingException {
+        Code code = new Code();
+        User user =  new User();
+        user.setId(userProvider.findIdbyEmail(emailCodeSendDTO.getEmail()));
+        code.setUser(user);
+        this.emailCodeRepository.save(code);
+        this.sendEmail(emailCodeSendDTO.getEmail(), "Código de confimação GymbroMatch", "Seu código de confirmação é: " + code.getCode());
+    }
+
+    // REQUIRE AUTHENTICATION
 
     @Scheduled(fixedRate = 120000) // Runs every 2 minutes
     @Transactional
@@ -69,7 +56,6 @@ public class EmailCodeService {
         emailCodeRepository.deleteAllBycreatedAtBefore(cutoffTime);
     }
 
-    @RequiresAuthorization()
     private void sendEmail(String para, String assunto, String corpo) throws MailException, MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);

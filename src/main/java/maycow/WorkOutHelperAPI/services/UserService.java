@@ -7,7 +7,7 @@ import maycow.WorkOutHelperAPI.annotations.RequiresAuthorization;
 import maycow.WorkOutHelperAPI.dto.user.UserCreateDTO;
 import maycow.WorkOutHelperAPI.dto.user.UserPasswordUpdateDTO;
 import maycow.WorkOutHelperAPI.models.enums.ProfileEnum;
-import maycow.WorkOutHelperAPI.providers.EmailCodeProvider;
+import maycow.WorkOutHelperAPI.providers.CodeProvider;
 import maycow.WorkOutHelperAPI.repositories.UserRepository;
 import maycow.WorkOutHelperAPI.services.exceptions.AuthorizationException;
 import maycow.WorkOutHelperAPI.services.exceptions.InvalidEmailCodeException;
@@ -28,15 +28,19 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private EmailCodeProvider emailCodeProvider;
+    private CodeProvider codeProvider;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    /** DO NOT REQUIRE AUTHENTICATION **/
+
     @Transactional
     public void activateAccountEmail(UserEmailCodeActivationDTO userEmailCodeActivationDTO) {
-        User user = this.findByEmail(userEmailCodeActivationDTO.getEmail());
-        if (emailCodeProvider.isValidEmailCode(user.getId(), userEmailCodeActivationDTO)) {
+        String userId = userRepository.findIdByEmail(userEmailCodeActivationDTO.getEmail())
+            .orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado!"));;
+        if (codeProvider.isCodeValid(userId, userEmailCodeActivationDTO)) {
+            User user = userRepository.findById(userId).orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado!"));
             user.setEmail_status_account(true);
             this.userRepository.save(user);
         } else {
@@ -44,6 +48,17 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public User create(UserCreateDTO userDTO) {
+        User user = new ObjectMapper().convertValue(userDTO, User.class);
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setProfiles(Stream.of(ProfileEnum.USER.getCode()).collect(Collectors.toSet()));
+        return this.userRepository.save(user);
+    }
+
+    /** REQUIRE AUTHENTICATION **/
+
+    @RequiresAuthorization()
     @Transactional
     public void updatePassword(UserPasswordUpdateDTO userPasswordUpdateDTO, String id) {
         User user = this.findById(id);
@@ -73,13 +88,5 @@ public class UserService {
         Optional<User> user = this.userRepository.findByEmail(email);
         return user.orElseThrow(() -> new ObjectNotFoundException(
                 "Usuário não encontrado! email: " + email + ", Tipo: " + User.class.getName()));
-    }
-
-    @Transactional
-    public User create(UserCreateDTO userDTO) {
-        User user = new ObjectMapper().convertValue(userDTO, User.class);
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user.setProfiles(Stream.of(ProfileEnum.USER.getCode()).collect(Collectors.toSet()));
-        return this.userRepository.save(user);
     }
 }

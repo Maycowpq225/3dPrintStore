@@ -43,7 +43,7 @@ public class UserController {
     @PostMapping("/email_activation")
     public ResponseEntity<MessageResponseDTO> emailActivation(@Valid @RequestBody UserEmailCodeActivationDTO userEmailCodeActivationDTO) {
         this.userService.activateAccountEmail(userEmailCodeActivationDTO);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new MessageResponseDTO("Email da conta ativado com sucesso"));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new MessageResponseDTO("Email ativado com sucesso"));
     }
 
     @DeleteMapping("/{id}")

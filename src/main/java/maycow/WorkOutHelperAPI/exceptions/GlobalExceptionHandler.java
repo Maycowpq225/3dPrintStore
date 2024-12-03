@@ -57,7 +57,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
     @ExceptionHandler(InvalidEmailCodeException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ResponseEntity<Object> handleInvalidEmailCodeException(InvalidEmailCodeException invalidEmailCodeException) {
-        final String errorMessage = "Código de ativação do email invalido.";
+        final String errorMessage = "Código invalido!";
         log.error(errorMessage, invalidEmailCodeException);
         return buildErrorResponse(errorMessage, HttpStatus.FORBIDDEN);
     }
@@ -105,7 +105,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
             WebRequest request) {
         log.error("Failed to find the requested element", objectNotFoundException);
         return buildErrorResponse(
-                "Authorization error",
+                objectNotFoundException.getMessage(),
                 HttpStatus.NOT_FOUND);
     }
 

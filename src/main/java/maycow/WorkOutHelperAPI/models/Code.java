@@ -10,13 +10,13 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
 @Entity                         // It means that the class is a table in the database
-@Table(name = EmailCode.TABLE_NAME)  // This all create the table and define it as a Entity
+@Table(name = Code.TABLE_NAME)  // This all create the table and define it as a Entity
 @AllArgsConstructor             // Construct with all arguments
 @NoArgsConstructor              // Construct with no arguments
 @Data                           // Creates Getters and Setters
-public class EmailCode {
+public class Code {
 
-    public static final String TABLE_NAME = "email_code";
+    public static final String TABLE_NAME = "code";
 
     @Id
     @GeneratedValue(generator = "uuid")
