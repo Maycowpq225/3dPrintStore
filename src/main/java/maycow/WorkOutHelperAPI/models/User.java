@@ -36,6 +36,7 @@ public class User {
     @Size(min = 10, max = 256)
     private String email;
 
+    //@PasswordConstraint
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password", length = 100, nullable = false)
     @NotBlank(message = "Senha não pode ser vazia.")
@@ -53,8 +54,8 @@ public class User {
     @Size(min = 2, max = 256)
     private String name;
 
-    @Column(name = "email_status_account", nullable = false)
-    private Boolean email_status_account;
+    @Column(name = "user_status", nullable = false)
+    private Boolean user_status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date created_at;
@@ -79,6 +80,6 @@ public class User {
     @PrePersist
     protected void onCreate() {
         created_at = new Date();
-        email_status_account = false;
+        user_status = false;
     }
 }

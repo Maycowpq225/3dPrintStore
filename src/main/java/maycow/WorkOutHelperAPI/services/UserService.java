@@ -8,11 +8,13 @@ import maycow.WorkOutHelperAPI.dto.user.UserCreateDTO;
 import maycow.WorkOutHelperAPI.dto.user.UserPasswordUpdateDTO;
 import maycow.WorkOutHelperAPI.models.enums.ProfileEnum;
 import maycow.WorkOutHelperAPI.providers.CodeProvider;
+import maycow.WorkOutHelperAPI.providers.UserProvider;
 import maycow.WorkOutHelperAPI.repositories.UserRepository;
 import maycow.WorkOutHelperAPI.services.exceptions.AuthorizationException;
 import maycow.WorkOutHelperAPI.services.exceptions.InvalidEmailCodeException;
-import maycow.WorkOutHelperAPI.services.exceptions.ObjectNotFoundException;
+import maycow.WorkOutHelperAPI.services.exceptions.UserAlreadyConfirmedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,21 +33,26 @@ public class UserService {
     private CodeProvider codeProvider;
 
     @Autowired
+    private UserProvider userProvider;
+
+    @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     /** DO NOT REQUIRE AUTHENTICATION **/
 
     @Transactional
     public void activateAccountEmail(UserEmailCodeActivationDTO userEmailCodeActivationDTO) {
-        String userId = userRepository.findIdByEmail(userEmailCodeActivationDTO.getEmail())
-            .orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado!"));;
-        if (codeProvider.isCodeValid(userId, userEmailCodeActivationDTO)) {
-            User user = userRepository.findById(userId).orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado!"));
-            user.setEmail_status_account(true);
-            this.userRepository.save(user);
-        } else {
-            throw new InvalidEmailCodeException("Código invalido!");
-        }
+        if (!userProvider.isUserStatusConfirmed(userEmailCodeActivationDTO.getEmail())) {
+            String userId = userRepository.findIdByEmail(userEmailCodeActivationDTO.getEmail())
+                    .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado!"));;
+            if (codeProvider.isCodeValid(userId, userEmailCodeActivationDTO)) {
+                User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado!"));
+                user.setUser_status(true);
+                this.userRepository.save(user);
+            } else
+                throw new InvalidEmailCodeException("Código invalido!");
+        } else
+            throw new UserAlreadyConfirmedException("Usuário já está confirmado.");
     }
 
     @Transactional
@@ -79,14 +86,14 @@ public class UserService {
     @RequiresAuthorization()
     public User findById(String id) {
         Optional<User> user = this.userRepository.findById(id);
-        return user.orElseThrow(() -> new ObjectNotFoundException(
+        return user.orElseThrow(() -> new UsernameNotFoundException(
                 "Usuário não encontrado! Id: " + id + ", Tipo: " + User.class.getName()));
     }
 
     @RequiresAuthorization()
     public User findByEmail(String email) {
         Optional<User> user = this.userRepository.findByEmail(email);
-        return user.orElseThrow(() -> new ObjectNotFoundException(
+        return user.orElseThrow(() -> new UsernameNotFoundException(
                 "Usuário não encontrado! email: " + email + ", Tipo: " + User.class.getName()));
     }
 }

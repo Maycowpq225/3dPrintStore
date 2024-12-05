@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import maycow.WorkOutHelperAPI.annotations.PasswordConstraint;
 
 import java.util.Date;
 
@@ -22,6 +23,7 @@ public class UserCreateDTO {
     @Email
     private String email;
 
+    @PasswordConstraint
     @NotBlank
     @Size(min = 8, max = 60)
     private String password;

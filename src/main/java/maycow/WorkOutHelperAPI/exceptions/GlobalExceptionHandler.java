@@ -7,8 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 
-import maycow.WorkOutHelperAPI.services.exceptions.AuthorizationException;
-import maycow.WorkOutHelperAPI.services.exceptions.InvalidEmailCodeException;
+import maycow.WorkOutHelperAPI.services.exceptions.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -25,9 +24,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import maycow.WorkOutHelperAPI.services.exceptions.DataBindingViolationException;
-import maycow.WorkOutHelperAPI.services.exceptions.ObjectNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,21 +58,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
         return buildErrorResponse(errorMessage, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(UserAlreadyConfirmedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<Object> handleUserAlreadyConfirmedException(UserAlreadyConfirmedException userAlreadyConfirmedException) {
+        return buildErrorResponse(userAlreadyConfirmedException.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException usernameNotFoundException) {
+        return buildErrorResponse(usernameNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<Object> handleAllUncaughtException(Exception exception, WebRequest request) {
         final String errorMessage = "Unknown error occurred";
         log.error(errorMessage, exception);
         return buildErrorResponse(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(UsernameNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException usernameNotFoundException) {
-        log.error("Failed to find the user", usernameNotFoundException);
-        return buildErrorResponse(
-                "User not found!",
-                HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
