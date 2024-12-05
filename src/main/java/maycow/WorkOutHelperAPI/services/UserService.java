@@ -56,11 +56,11 @@ public class UserService {
     }
 
     @Transactional
-    public User create(UserCreateDTO userDTO) {
+    public void create(UserCreateDTO userDTO) {
         User user = new ObjectMapper().convertValue(userDTO, User.class);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setProfiles(Stream.of(ProfileEnum.USER.getCode()).collect(Collectors.toSet()));
-        return this.userRepository.save(user);
+        this.userRepository.save(user);
     }
 
     /** REQUIRE AUTHENTICATION **/

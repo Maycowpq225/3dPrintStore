@@ -50,12 +50,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
         return ResponseEntity.unprocessableEntity().body(errorResponse);
     }
 
+    @ExceptionHandler(UserNotConfirmedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<Object> handleUserNotConfirmedException(UserNotConfirmedException userNotConfirmedException) {
+        return buildErrorResponse(userNotConfirmedException.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(InvalidEmailCodeException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ResponseEntity<Object> handleInvalidEmailCodeException(InvalidEmailCodeException invalidEmailCodeException) {
-        final String errorMessage = "Código invalido!";
-        log.error(errorMessage, invalidEmailCodeException);
-        return buildErrorResponse(errorMessage, HttpStatus.FORBIDDEN);
+        return buildErrorResponse(invalidEmailCodeException.getMessage(), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(UserAlreadyConfirmedException.class)
@@ -161,7 +165,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
         Integer status = HttpStatus.UNAUTHORIZED.value();
         response.setStatus(status);
         response.setContentType("application/json");
-        ErrorResponse errorResponse = new ErrorResponse(status, "Email ou senha inválidos.");
+        ErrorResponse errorResponse = new ErrorResponse(status, exception.getMessage());
         response.getWriter().append(errorResponse.toJson());
     }
 }
