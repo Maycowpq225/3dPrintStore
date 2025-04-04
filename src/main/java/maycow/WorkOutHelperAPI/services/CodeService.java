@@ -67,7 +67,6 @@ public class CodeService {
         helper.setTo(para);
         helper.setSubject(assunto);
         helper.setText(corpo, true);  // O segundo parâmetro define se o corpo é HTML
-
         // Enviar email
         mailSender.send(mimeMessage);
     }
