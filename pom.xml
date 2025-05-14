@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>maycow</groupId>
-	<artifactId>WorkOutHelperAPI</artifactId>
+	<artifactId>3dPrintStore</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>WorkOutHelperAPI</name>
+	<name>3dPrintStore</name>
 	<description>Spring Boot API for To Do App</description>
 	<properties>
 		<java.version>17</java.version>
