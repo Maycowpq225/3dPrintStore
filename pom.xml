@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>maycow</groupId>
-	<artifactId>3dPrintStore</artifactId>
+	<artifactId>PrintStore3D</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>3dPrintStore</name>
 	<description>Spring Boot API for To Do App</description>
@@ -17,6 +17,12 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.6.15</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

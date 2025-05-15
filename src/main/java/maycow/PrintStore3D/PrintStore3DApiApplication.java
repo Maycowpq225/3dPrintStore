@@ -1,4 +1,4 @@
-package maycow.PrintStore3D;
+package maycow.printstore3d;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
